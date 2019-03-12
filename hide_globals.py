@@ -3,7 +3,6 @@ import types
 def noglobals(f):
     inner_globals = dict()
     inner_globals['__builtins__'] = globals().get('__builtins__')
-    inner_globals['__import__'] = globals().get('__import__')
     return types.FunctionType(f.__code__, inner_globals)
 
 import os
