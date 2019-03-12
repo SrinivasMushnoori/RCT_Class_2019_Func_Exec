@@ -15,8 +15,8 @@ def hide_user(f):
     return types.FunctionType(f.__code__, inner_globals)
 
 @hide_user
-def eval_user(code):
-    """evaluates code with
+def exec_user(code):
+    """executes code with
     globals hidden
 
     Args:
@@ -26,6 +26,6 @@ def eval_user(code):
         any: return value of eval(code)
     """
     try:
-        return eval(code)
+        exec(code)
     except Exception:
         raise
