@@ -1,21 +1,28 @@
 import types
 
-def noglobals(f):
+def hide_user(f):
+    """Hide all globals
+    except builtins
+
+    Args:
+        f (function pointer): function to hide globals within
+
+    Returns:
+        function pointer: with globals hidden
+    """
     inner_globals = dict()
     inner_globals['__builtins__'] = globals().get('__builtins__')
     return types.FunctionType(f.__code__, inner_globals)
 
-import os
+@hide_user
+def eval_user(code):
+    """evaluates code with
+    globals hidden
 
-@noglobals
-def test1():
-    try:
-        print(os.__name__)
-    except NameError:
-        print('os module can\'t be imported from globals')
-        print('importing inside')
-        import os
-        print(os.__name__)
+    Args:
+        code (str): string of code
 
-test1()
-print(globals())
+    Returns:
+        any: return value of eval(code)
+    """
+    return eval(code)
