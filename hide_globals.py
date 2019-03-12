@@ -25,4 +25,7 @@ def eval_user(code):
     Returns:
         any: return value of eval(code)
     """
-    return eval(code)
+    try:
+        return eval(code)
+    except Exception:
+        raise
