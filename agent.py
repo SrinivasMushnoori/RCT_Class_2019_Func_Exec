@@ -13,9 +13,9 @@ from hide_globals import exec_user as execute_cu
 logger  = logging.getLogger(__name__)
 logging.basicConfig(level=logging.NOTSET)
 
-os.spawnl(os.P_DETACH, 'queue.cu_queue()')
 
-class Agent():
+
+class Executor():
 
     def __init__(self, addr):
         self.addr    = addr
@@ -24,7 +24,7 @@ class Agent():
 
     def __enter__(self):
 
-        logger.info('Starting to enter Agent instance')
+        logger.info('Starting to enter Executor instance')
 
         self.context = zmq.Context()
         self.socket  = self.context.socket(zmq.REQ)
@@ -33,17 +33,17 @@ class Agent():
 
         self.socket.connect(self.addr)
 
-        logger.info('Finished entering Agent instance')
+        logger.info('Finished entering Executor instance')
 
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
 
-        logger.info('Starting to exit Agent instance')
+        logger.info('Starting to exit Executor instance')
 
         self.socket.close()
 
-        logger.info('Finished exiting Agent instance')
+        logger.info('Finished exiting Executor instance')
 
     def req_msg(self):
 
@@ -79,26 +79,37 @@ class Agent():
 
         return result
 
+class ComputeUnit():
+	# A CU is a container that runs one instance of an executor.
+	  
+    
+    def CU_Execute():
+
+    #DELAY = 0.5
+
+        addr = None
+        with open('test.bridge.url', 'r') as fin:
+            for line in fin.readlines():
+                tag, addr = line.split()
+                if tag == 'GET':
+                    break
+
+        print 'GET: %s' % addr
+
+        with addr(addr) as agent:
+  
+            while True:
+                msg = agent.req_msg()
+
+                unit = pickle.loads(msg['data'])
+
+                agent.execute(unit)
+
 if __name__ == '__main__':
+    # Spawn the queue first
+    os.spawnl(os.P_DETACH, 'queue.cu_queue()')
 
-    DELAY = 0.5
 
-    addr = None
-    with open('test.bridge.url', 'r') as fin:
-        for line in fin.readlines():
-            tag, addr = line.split()
-            if tag == 'GET':
-                break
 
-    print 'GET: %s' % addr
-
-    with addr(addr) as agent:
-
-        while True:
-            msg = agent.req_msg()
-
-            unit = pickle.loads(msg['data'])
-
-            agent.execute(unit)
 
 time.sleep(DELAY)
