@@ -79,37 +79,64 @@ class Executor():
 
         return result
 
-class ComputeUnit():
+#class ComputeUnit():
 	# A CU is a container that runs one instance of an executor.
 	  
     
-    def CU_Execute():
+    #def CU_Execute():
 
     #DELAY = 0.5
 
-        addr = None
-        with open('test.bridge.url', 'r') as fin:
-            for line in fin.readlines():
-                tag, addr = line.split()
-                if tag == 'GET':
-                    break
+    #    addr = None
+    #    with open('test.bridge.url', 'r') as fin:
+    #        for line in fin.readlines():
+    #            tag, addr = line.split()
+    #            if tag == 'GET':
+    #                break
 
-        print 'GET: %s' % addr
+    #    print 'GET: %s' % addr
 
-        with addr(addr) as agent:
+    #    with addr(addr) as executor:
   
-            while True:
-                msg = agent.req_msg()
+    #        while True:
+    #            msg = executor.req_msg()
 
-                unit = pickle.loads(msg['data'])
+    #            unit = pickle.loads(msg['data'])
 
-                agent.execute(unit)
+    #            executor.execute(unit)
 
 if __name__ == '__main__':
+
+
+    
+    # Hard code number of cores for now. 
+    CORES = 8
+    
     # Spawn the queue first
-    os.spawnl(os.P_DETACH, 'queue.cu_queue()')
+    os.spawnl(os.P_NOWAIT, 'queue.cu_queue()')
+
+    # Get the queue address
+    addr = None
+    with open('test.bridge.url', 'r') as fin:
+        for line in fin.readlines():
+            tag, addr = line.split()
+            if tag == 'GET':
+                break
+
+    print 'GET: %s' % addr
+
+    workers = [None]*CORES
+
+    for worker in range(CORES):
+
+        print workers[worker]
+        with Executor(addr) as workers[worker]:
+  
+            while True:
+                msg = workers[worker].req_msg()
+                unit = pickle.loads(msg['data'])
+                workers[worker].execute(unit)
 
 
 
-
-time.sleep(DELAY)
+time.sleep(0)
